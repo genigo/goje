@@ -61,7 +61,7 @@ func (c Context) Rollback() error {
 // Entity All generated structs implemented from Entity
 type Entity interface {
 	TableName() string
-	Columns() []string
+	GetColumns() []string
 	GetCtx() *Context
 	GetParent() *Entity
 }
