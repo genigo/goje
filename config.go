@@ -36,7 +36,7 @@ func (db DBConfig) String() string {
 	u := &url.URL{
 		Scheme: "mysql",
 		User:   url.UserPassword(db.User, db.Password),
-		Host:   fmt.Sprintf("%s:%d", db.Host, db.Port),
+		Host:   fmt.Sprintf("tcp(%s:%d)", db.Host, db.Port),
 		Path:   "/" + db.Schema,
 	}
 
