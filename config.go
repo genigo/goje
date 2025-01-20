@@ -34,7 +34,7 @@ type DBConfig struct {
 func (db DBConfig) String() string {
 	// Create the base URL structure
 	u := &url.URL{
-		Scheme: "mysql",
+		Scheme: "",
 		User:   url.UserPassword(db.User, db.Password),
 		Host:   fmt.Sprintf("tcp(%s:%d)", db.Host, db.Port),
 		Path:   "/" + db.Schema,
@@ -52,5 +52,5 @@ func (db DBConfig) String() string {
 	// Set the query string on the URL
 	u.RawQuery = q.Encode()
 
-	return u.String()
+	return u.String()[2:]
 }
