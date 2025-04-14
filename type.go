@@ -64,6 +64,7 @@ type Entity interface {
 	GetColumns() []string
 	GetCtx() *Context
 	GetParent() *Entity
+	GetOrCreate() error
 }
 
 var (
