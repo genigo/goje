@@ -1,5 +1,7 @@
 package goje
 
+import "strings"
+
 /*
 *
 
@@ -160,12 +162,56 @@ func Where(query string, args ...any) QueryWhere {
 }
 
 /**
+	OR Query
+**/
+
+type QueryOR struct {
+	queries []QueryInterface
+}
+
+func (q QueryOR) GetType() string {
+	return QueryTypeOR
+}
+
+func (q QueryOR) GetQuery() string {
+	out := []string{}
+	for _, q := range q.queries {
+		if q.GetType() == QueryTypeWhere ||
+			q.GetType() == QueryTypeOR ||
+			q.GetType() == QueryTypeWhereIn ||
+			q.GetType() == QueryTypeWhereNotIn {
+			out = append(out, q.GetQuery())
+		}
+	}
+	return strings.Join(out, " OR ")
+}
+
+func (q QueryOR) GetArgs() []any {
+	out := []any{}
+	for _, q := range q.queries {
+		if q.GetType() == QueryTypeWhere ||
+			q.GetType() == QueryTypeOR ||
+			q.GetType() == QueryTypeWhereIn ||
+			q.GetType() == QueryTypeWhereNotIn {
+			out = append(out, q.GetArgs()...)
+		}
+	}
+	return out
+}
+
+func OR(queries ...QueryInterface) QueryOR {
+	return QueryOR{
+		queries: queries,
+	}
+}
+
+/**
 	Where in Query
 **/
 
 type QueryWhereIn struct {
-	query string
-	args  []any
+	column string
+	args   []any
 }
 
 func (q QueryWhereIn) GetType() string {
@@ -173,7 +219,11 @@ func (q QueryWhereIn) GetType() string {
 }
 
 func (q QueryWhereIn) GetQuery() string {
-	return q.query
+	if len(q.args) == 0 {
+		return "1"
+	}
+	bindParams := strings.Repeat(",?", len(q.args))
+	return q.column + " IN(" + bindParams[1:] + ")"
 }
 
 func (q QueryWhereIn) GetArgs() []any {
@@ -182,18 +232,18 @@ func (q QueryWhereIn) GetArgs() []any {
 
 func WhereIn(columnName string, args ...any) QueryWhereIn {
 	return QueryWhereIn{
-		query: columnName,
-		args:  args,
+		column: columnName,
+		args:   args,
 	}
 }
 
 /**
-	Where in Query
+	Where not in Query
 **/
 
 type QueryWhereNotIn struct {
-	query string
-	args  []any
+	column string
+	args   []any
 }
 
 func (q QueryWhereNotIn) GetType() string {
@@ -201,7 +251,11 @@ func (q QueryWhereNotIn) GetType() string {
 }
 
 func (q QueryWhereNotIn) GetQuery() string {
-	return q.query
+	if len(q.args) == 0 {
+		return "1"
+	}
+	bindParams := strings.Repeat(",?", len(q.args))
+	return q.column + " NOT IN(" + bindParams[1:] + ")"
 }
 
 func (q QueryWhereNotIn) GetArgs() []any {
@@ -210,8 +264,8 @@ func (q QueryWhereNotIn) GetArgs() []any {
 
 func WhereNotIn(columnName string, args ...any) QueryWhereNotIn {
 	return QueryWhereNotIn{
-		query: columnName,
-		args:  args,
+		column: columnName,
+		args:   args,
 	}
 }
 

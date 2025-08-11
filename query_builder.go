@@ -15,6 +15,7 @@ const (
 	QueryTypeWhereIn    = "where in"
 	QueryTypeWhereNotIn = "where not in"
 	QueryTypeJoin       = "join"
+	QueryTypeOR         = "or"
 )
 
 type QueryInterface interface {
@@ -80,28 +81,11 @@ func SQLConditionBuilder(Queries []QueryInterface) (string, []any, error) {
 
 	//Produce Where condition
 	for _, q := range Queries {
-		if q.GetType() == QueryTypeWhere {
+		if q.GetType() == QueryTypeWhere || q.GetType() == QueryTypeOR || q.GetType() == QueryTypeWhereIn || q.GetType() == QueryTypeWhereNotIn {
 			if strings.Count(q.GetQuery(), "?") != len(q.GetArgs()) {
 				return "", nil, errors.New(q.GetQuery() + "; args dosen't match with binds `?`")
 			}
 			where = append(where, "("+q.GetQuery()+")")
-			args = append(args, q.GetArgs()...)
-		}
-	}
-
-	//Produce `where in`` and `where not in`` condition
-	for _, q := range Queries {
-		if q.GetType() == QueryTypeWhereIn || q.GetType() == QueryTypeWhereNotIn {
-			if len(q.GetArgs()) == 0 {
-				return "", nil, errors.New(q.GetQuery() + "; should have at least one argument")
-			}
-
-			bindParams := strings.Repeat(",?", len(q.GetArgs()))
-			not := ""
-			if q.GetType() == QueryTypeWhereNotIn {
-				not = " NOT"
-			}
-			where = append(where, "("+q.GetQuery()+not+" IN("+bindParams[1:]+"))")
 			args = append(args, q.GetArgs()...)
 		}
 	}

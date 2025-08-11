@@ -113,6 +113,10 @@ func TestSelectQueryBuilder(t *testing.T) {
 				Tablename: "users",
 				Queries: []QueryInterface{
 					Where("user_id=?", 1),
+					OR(
+						Where("tags LIKE ?", "blocked"),
+						Where("tags LIKE ?", "suspicious"),
+					),
 					Order("user_id DESC"),
 					Limit(100),
 					Offset(1),
@@ -129,8 +133,8 @@ func TestSelectQueryBuilder(t *testing.T) {
 					"GROUP_CONCAT(baskets.products) as pids",
 				},
 			},
-			want:    "SELECT `user_id`,`name`,GROUP_CONCAT(baskets.products) as pids  FROM users  LEFT JOIN products ON baskets.product_id = products.id  INNER JOIN baskets ON baskets.user_id = users.id  WHERE (user_id=?) GROUP BY `user_id`,`name` HAVING user_id > 1 AND LENGTH(name) = 1 ORDER BY user_id DESC LIMIT ? OFFSET ?",
-			want1:   3,
+			want:    "SELECT `user_id`,`name`,GROUP_CONCAT(baskets.products) as pids  FROM users  LEFT JOIN products ON baskets.product_id = products.id  INNER JOIN baskets ON baskets.user_id = users.id  WHERE (user_id=?) AND (tags LIKE ? OR tags LIKE ?) GROUP BY `user_id`,`name` HAVING user_id > 1 AND LENGTH(name) = 1 ORDER BY user_id DESC LIMIT ? OFFSET ?",
+			want1:   5,
 			wantErr: false,
 		},
 	}
