@@ -117,7 +117,7 @@ func SQLConditionBuilder(Queries []QueryInterface) (string, []any, error) {
 			if strings.Count(q.GetQuery(), "?") != len(q.GetArgs()) {
 				return "", nil, errors.New(q.GetQuery() + "; args dosen't match with binds `?`")
 			}
-			groupbys = append(groupbys, columnFilter(q.GetQuery()))
+			groupbys = append(groupbys, qouteColumn(q.GetQuery()))
 			args = append(args, q.GetArgs()...)
 		}
 
@@ -133,7 +133,7 @@ func SQLConditionBuilder(Queries []QueryInterface) (string, []any, error) {
 			if strings.Count(q.GetQuery(), "?") != len(q.GetArgs()) {
 				return "", nil, errors.New(q.GetQuery() + "; args dosen't match with binds `?`")
 			}
-			havings = append(havings, columnFilter(q.GetQuery()))
+			havings = append(havings, qouteColumn(q.GetQuery()))
 			args = append(args, q.GetArgs()...)
 		}
 	}
@@ -169,20 +169,36 @@ func SQLConditionBuilder(Queries []QueryInterface) (string, []any, error) {
 // filter multiple columns
 func columnsFilter(in []string) []string {
 	for i := range in {
-		in[i] = columnFilter(in[i])
+		in[i] = qouteColumn(in[i])
 	}
 	return in
 }
 
 // filter column: add backtik if needed
-func columnFilter(v string) string {
-	if strings.Contains(v, "`") ||
-		strings.Contains(v, " ") ||
-		strings.Contains(v, "(") ||
-		strings.Contains(v, "*") ||
-		strings.Contains(v, "%") ||
-		strings.Contains(v, ".") {
-		return v
+func qouteColumn(input string) string {
+	if strings.Contains(input, "`") ||
+		strings.Contains(input, " ") ||
+		strings.Contains(input, "(") ||
+		strings.Contains(input, ":") ||
+		strings.Contains(input, "+") ||
+		strings.Contains(input, "-") ||
+		strings.Contains(input, "^") ||
+		strings.Contains(input, "=") ||
+		strings.Contains(input, "'") ||
+		strings.Contains(input, "\"") ||
+		strings.Contains(input, "*") ||
+		strings.Contains(input, "/") ||
+		strings.Contains(input, "%") {
+		return input
 	}
-	return "`" + v + "`"
+	// backtick all parts
+	if strings.Contains(input, ".") {
+		values := strings.Split(input, ".")
+		for i := range values {
+			values[i] = qouteColumn(values[i])
+		}
+		return strings.Join(values, ".")
+	}
+
+	return "`" + input + "`"
 }

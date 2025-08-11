@@ -29,7 +29,7 @@ func TestSQLConditionBuilder(t *testing.T) {
 					Where("id=?", 1),
 				},
 			},
-			want:    "  WHERE id=?",
+			want:    "  WHERE (id=?)",
 			want1:   1,
 			wantErr: false,
 		},
@@ -47,7 +47,7 @@ func TestSQLConditionBuilder(t *testing.T) {
 					Having("LENGTH(name) = 1"),
 				},
 			},
-			want:    "  WHERE id=? GROUP BY `id`,`name` HAVING id > 1 AND LENGTH(name) = 1 ORDER BY id DESC LIMIT ? OFFSET ?",
+			want:    "  WHERE (id=?) GROUP BY `id`,`name` HAVING id > 1 AND LENGTH(name) = 1 ORDER BY id DESC LIMIT ? OFFSET ?",
 			want1:   3,
 			wantErr: false,
 		},
@@ -103,7 +103,7 @@ func TestSelectQueryBuilder(t *testing.T) {
 					"GROUP_CONCAT(baskets.products) as pids",
 				},
 			},
-			want:    "SELECT `user_id`,`name`,GROUP_CONCAT(baskets.products) as pids  FROM users  INNER JOIN baskets ON baskets.user_id = users.id  WHERE user_id=? GROUP BY `user_id`,`name` HAVING user_id > 1 AND LENGTH(name) = 1 ORDER BY user_id DESC LIMIT ? OFFSET ?",
+			want:    "SELECT `user_id`,`name`,GROUP_CONCAT(baskets.products) as pids  FROM users  INNER JOIN baskets ON baskets.user_id = users.id  WHERE (user_id=?) GROUP BY `user_id`,`name` HAVING user_id > 1 AND LENGTH(name) = 1 ORDER BY user_id DESC LIMIT ? OFFSET ?",
 			want1:   3,
 			wantErr: false,
 		},
@@ -129,7 +129,7 @@ func TestSelectQueryBuilder(t *testing.T) {
 					"GROUP_CONCAT(baskets.products) as pids",
 				},
 			},
-			want:    "SELECT `user_id`,`name`,GROUP_CONCAT(baskets.products) as pids  FROM users  LEFT JOIN products ON baskets.product_id = products.id  INNER JOIN baskets ON baskets.user_id = users.id  WHERE user_id=? GROUP BY `user_id`,`name` HAVING user_id > 1 AND LENGTH(name) = 1 ORDER BY user_id DESC LIMIT ? OFFSET ?",
+			want:    "SELECT `user_id`,`name`,GROUP_CONCAT(baskets.products) as pids  FROM users  LEFT JOIN products ON baskets.product_id = products.id  INNER JOIN baskets ON baskets.user_id = users.id  WHERE (user_id=?) GROUP BY `user_id`,`name` HAVING user_id > 1 AND LENGTH(name) = 1 ORDER BY user_id DESC LIMIT ? OFFSET ?",
 			want1:   3,
 			wantErr: false,
 		},
@@ -146,6 +146,60 @@ func TestSelectQueryBuilder(t *testing.T) {
 			}
 			if len(got1) != tt.want1 {
 				t.Errorf("SelectQueryBuilder() got1 = len(%v), want len = %v", got1, tt.want1)
+			}
+		})
+	}
+}
+
+func Test_qouteColumn(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "usual backtick",
+			args: args{
+				input: "id",
+			},
+			want: "`id`",
+		},
+		{
+			name: "multi section backtick qoute",
+			args: args{
+				input: "users.id",
+			},
+			want: "`users`.`id`",
+		},
+		{
+			name: "ignore function qoute",
+			args: args{
+				input: "SUM(total)",
+			},
+			want: "SUM(total)",
+		},
+		{
+			name: "ignore mathematic operators qoute",
+			args: args{
+				input: "total*1",
+			},
+			want: "total*1",
+		},
+		{
+			name: "ignore mathematic operators qoute",
+			args: args{
+				input: "total+1",
+			},
+			want: "total+1",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := qouteColumn(tt.args.input); got != tt.want {
+				t.Errorf("qouteColumn() = %v, want %v", got, tt.want)
 			}
 		})
 	}
