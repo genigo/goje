@@ -161,6 +161,14 @@ func Where(query string, args ...any) QueryWhere {
 	}
 }
 
+// Contains Query: A helper for `column LIKE '%Phrase%'`
+func Contains(columnName string, argument string) QueryWhere {
+	return QueryWhere{
+		query: qouteColumn(columnName) + " LIKE ?",
+		args:  []any{"%" + argument + "%"},
+	}
+}
+
 /**
 	OR Query
 **/
