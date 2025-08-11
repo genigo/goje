@@ -6,20 +6,21 @@ import (
 )
 
 const (
-	QueryTypeLimit   = "limit"
-	QueryTypeOffset  = "offset"
-	QueryTypeOrder   = "order"
-	QueryTypeHaving  = "having"
-	QueryTypeGroup   = "group"
-	QueryTypeWhere   = "where"
-	QueryTypeWhereIn = "where in"
-	QueryTypeJoin    = "join"
+	QueryTypeLimit      = "limit"
+	QueryTypeOffset     = "offset"
+	QueryTypeOrder      = "order"
+	QueryTypeHaving     = "having"
+	QueryTypeGroup      = "group"
+	QueryTypeWhere      = "where"
+	QueryTypeWhereIn    = "where in"
+	QueryTypeWhereNotIn = "where not in"
+	QueryTypeJoin       = "join"
 )
 
 type QueryInterface interface {
 	GetType() string
 	GetQuery() string
-	GetArgs() []interface{}
+	GetArgs() []any
 }
 
 const (
@@ -36,12 +37,12 @@ const (
 )
 
 // make a select ... FROM query
-func SelectQueryBuilder(Tablename string, Columns []string, Queries []QueryInterface) (string, []interface{}, error) {
+func SelectQueryBuilder(Tablename string, Columns []string, Queries []QueryInterface) (string, []any, error) {
 	return ArgumentLessQueryBuilder(Select, Tablename, Columns, Queries)
 }
 
 // ArgumentLessQueryBuilder (Select, Delete) query builder
-func ArgumentLessQueryBuilder(Action, Tablename string, Columns []string, Queries []QueryInterface) (string, []interface{}, error) {
+func ArgumentLessQueryBuilder(Action, Tablename string, Columns []string, Queries []QueryInterface) (string, []any, error) {
 
 	if Action != Select && Action != Delete {
 		return "", nil, errors.New("this function dosen't support: " + Action)
@@ -62,11 +63,10 @@ func ArgumentLessQueryBuilder(Action, Tablename string, Columns []string, Querie
 }
 
 // SQLConditionBuilder [JOIN WHERE LIMIT OFFSET] ...builder
-func SQLConditionBuilder(Queries []QueryInterface) (string, []interface{}, error) {
+func SQLConditionBuilder(Queries []QueryInterface) (string, []any, error) {
 	query := " "
-	var args []interface{}
+	var args []any
 	var where []string
-
 	//Produce Joins
 	for _, q := range Queries {
 		if q.GetType() == QueryTypeJoin {
@@ -84,21 +84,24 @@ func SQLConditionBuilder(Queries []QueryInterface) (string, []interface{}, error
 			if strings.Count(q.GetQuery(), "?") != len(q.GetArgs()) {
 				return "", nil, errors.New(q.GetQuery() + "; args dosen't match with binds `?`")
 			}
-			where = append(where, q.GetQuery())
+			where = append(where, "("+q.GetQuery()+")")
 			args = append(args, q.GetArgs()...)
 		}
 	}
 
-	//Produce Where in condition
+	//Produce `where in`` and `where not in`` condition
 	for _, q := range Queries {
-		if q.GetType() == QueryTypeWhereIn {
+		if q.GetType() == QueryTypeWhereIn || q.GetType() == QueryTypeWhereNotIn {
 			if len(q.GetArgs()) == 0 {
 				return "", nil, errors.New(q.GetQuery() + "; should have at least one argument")
 			}
 
 			bindParams := strings.Repeat(",?", len(q.GetArgs()))
-
-			where = append(where, q.GetQuery()+" IN("+bindParams[1:]+")")
+			not := ""
+			if q.GetType() == QueryTypeWhereNotIn {
+				not = " NOT"
+			}
+			where = append(where, "("+q.GetQuery()+not+" IN("+bindParams[1:]+"))")
 			args = append(args, q.GetArgs()...)
 		}
 	}

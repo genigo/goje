@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// Default Database Connection that fill by
+// Default Database connection that fill by
 var DefatultDB *sql.DB
 
 // InitDB Connect default database
@@ -46,6 +46,11 @@ func GetHandler() *Context {
 		Ctx: context.TODO(),
 		DB:  DefatultDB,
 	}
+}
+
+// H is a shortcut for GetHandler
+func H() *Context {
+	return GetHandler()
 }
 
 // MakeHandler make a handler from default database

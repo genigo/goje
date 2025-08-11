@@ -22,12 +22,12 @@ func (handler *Context) RawDelete(Tablename string, Queries []QueryInterface) (i
 
 // RawUpdate update entries by map
 // This method dosen't support After,Before Triggers ...
-func (handler *Context) RawUpdate(Tablename string, Cols map[string]interface{}, Queries ...QueryInterface) (int64, error) {
+func (handler *Context) RawUpdate(Tablename string, Cols map[string]any, Queries ...QueryInterface) (int64, error) {
 	if len(Cols) == 0 {
 		return -1, ErrNoColsSetForUpdate
 	}
 	query := Update + " " + Tablename + " SET "
-	var args []interface{}
+	var args []any
 	var items []string
 	for key, val := range Cols {
 		items = append(items, Tablename+"."+key+" = ?")
@@ -50,13 +50,13 @@ func (handler *Context) RawUpdate(Tablename string, Cols map[string]interface{},
 
 // RawBulkInsert insert multiple entries by []map[column name]value
 // This method dosen't support After,Before Triggers ...
-func (handler *Context) RawBulkInsert(Tablename string, Rows []map[string]interface{}) (int64, error) {
+func (handler *Context) RawBulkInsert(Tablename string, Rows []map[string]any) (int64, error) {
 	if len(Rows) == 0 {
 		return -1, ErrNoRowsForInsert
 	}
 
 	query := Insert + " INTO " + Tablename
-	var args []interface{}
+	var args []any
 	var columnNames []string
 
 	for index, row := range Rows {

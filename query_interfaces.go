@@ -17,8 +17,8 @@ func (l QueryLimit) GetQuery() string {
 	return "LIMIT ?"
 }
 
-func (l QueryLimit) GetArgs() []interface{} {
-	return []interface{}{l}
+func (l QueryLimit) GetArgs() []any {
+	return []any{l}
 }
 
 func Limit(limit int) QueryLimit {
@@ -39,8 +39,8 @@ func (l QueryOffset) GetQuery() string {
 	return "OFFSET ?"
 }
 
-func (l QueryOffset) GetArgs() []interface{} {
-	return []interface{}{l}
+func (l QueryOffset) GetArgs() []any {
+	return []any{l}
 }
 
 func Offset(offset int) QueryOffset {
@@ -53,7 +53,7 @@ func Offset(offset int) QueryOffset {
 
 type QueryOrder struct {
 	query string
-	args  []interface{}
+	args  []any
 }
 
 func (o QueryOrder) GetType() string {
@@ -64,11 +64,11 @@ func (o QueryOrder) GetQuery() string {
 	return o.query
 }
 
-func (o QueryOrder) GetArgs() []interface{} {
+func (o QueryOrder) GetArgs() []any {
 	return o.args
 }
 
-func Order(query string, args ...interface{}) QueryOrder {
+func Order(query string, args ...any) QueryOrder {
 	return QueryOrder{
 		query: query,
 		args:  args,
@@ -81,7 +81,7 @@ func Order(query string, args ...interface{}) QueryOrder {
 
 type QueryGroup struct {
 	query string
-	args  []interface{}
+	args  []any
 }
 
 func (h QueryGroup) GetType() string {
@@ -92,11 +92,11 @@ func (h QueryGroup) GetQuery() string {
 	return h.query
 }
 
-func (h QueryGroup) GetArgs() []interface{} {
+func (h QueryGroup) GetArgs() []any {
 	return h.args
 }
 
-func GroupBy(query string, args ...interface{}) QueryGroup {
+func GroupBy(query string, args ...any) QueryGroup {
 	return QueryGroup{
 		query: query,
 		args:  args,
@@ -109,7 +109,7 @@ func GroupBy(query string, args ...interface{}) QueryGroup {
 
 type QueryHaving struct {
 	query string
-	args  []interface{}
+	args  []any
 }
 
 func (h QueryHaving) GetType() string {
@@ -120,11 +120,11 @@ func (h QueryHaving) GetQuery() string {
 	return h.query
 }
 
-func (h QueryHaving) GetArgs() []interface{} {
+func (h QueryHaving) GetArgs() []any {
 	return h.args
 }
 
-func Having(query string, args ...interface{}) QueryHaving {
+func Having(query string, args ...any) QueryHaving {
 	return QueryHaving{
 		query: query,
 		args:  args,
@@ -137,7 +137,7 @@ func Having(query string, args ...interface{}) QueryHaving {
 
 type QueryWhere struct {
 	query string
-	args  []interface{}
+	args  []any
 }
 
 func (q QueryWhere) GetType() string {
@@ -148,11 +148,11 @@ func (q QueryWhere) GetQuery() string {
 	return q.query
 }
 
-func (q QueryWhere) GetArgs() []interface{} {
+func (q QueryWhere) GetArgs() []any {
 	return q.args
 }
 
-func Where(query string, args ...interface{}) QueryWhere {
+func Where(query string, args ...any) QueryWhere {
 	return QueryWhere{
 		query: query,
 		args:  args,
@@ -165,7 +165,7 @@ func Where(query string, args ...interface{}) QueryWhere {
 
 type QueryWhereIn struct {
 	query string
-	args  []interface{}
+	args  []any
 }
 
 func (q QueryWhereIn) GetType() string {
@@ -176,12 +176,40 @@ func (q QueryWhereIn) GetQuery() string {
 	return q.query
 }
 
-func (q QueryWhereIn) GetArgs() []interface{} {
+func (q QueryWhereIn) GetArgs() []any {
 	return q.args
 }
 
-func WhereIn(columnName string, args ...interface{}) QueryWhereIn {
+func WhereIn(columnName string, args ...any) QueryWhereIn {
 	return QueryWhereIn{
+		query: columnName,
+		args:  args,
+	}
+}
+
+/**
+	Where in Query
+**/
+
+type QueryWhereNotIn struct {
+	query string
+	args  []any
+}
+
+func (q QueryWhereNotIn) GetType() string {
+	return QueryTypeWhereNotIn
+}
+
+func (q QueryWhereNotIn) GetQuery() string {
+	return q.query
+}
+
+func (q QueryWhereNotIn) GetArgs() []any {
+	return q.args
+}
+
+func WhereNotIn(columnName string, args ...any) QueryWhereNotIn {
+	return QueryWhereNotIn{
 		query: columnName,
 		args:  args,
 	}
@@ -195,7 +223,7 @@ type QueryJoin struct {
 	joinType string
 	table    string
 	on       string
-	args     []interface{}
+	args     []any
 }
 
 func (q QueryJoin) GetType() string {
@@ -210,11 +238,11 @@ func (q QueryJoin) GetQuery() string {
 	return " " + q.joinType + " JOIN " + q.table + on + " "
 }
 
-func (q QueryJoin) GetArgs() []interface{} {
+func (q QueryJoin) GetArgs() []any {
 	return q.args
 }
 
-func InnerJoin(table string, on string, args ...interface{}) QueryJoin {
+func InnerJoin(table string, on string, args ...any) QueryJoin {
 	return QueryJoin{
 		on:       on,
 		joinType: Inner,
@@ -223,7 +251,7 @@ func InnerJoin(table string, on string, args ...interface{}) QueryJoin {
 	}
 }
 
-func OuterJoin(table string, on string, args ...interface{}) QueryJoin {
+func OuterJoin(table string, on string, args ...any) QueryJoin {
 	return QueryJoin{
 		on:       on,
 		joinType: Outer,
@@ -232,7 +260,7 @@ func OuterJoin(table string, on string, args ...interface{}) QueryJoin {
 	}
 }
 
-func NaturalJoin(table string, on string, args ...interface{}) QueryJoin {
+func NaturalJoin(table string, on string, args ...any) QueryJoin {
 	return QueryJoin{
 		on:       on,
 		joinType: Natural,
@@ -241,7 +269,7 @@ func NaturalJoin(table string, on string, args ...interface{}) QueryJoin {
 	}
 }
 
-func RightJoin(table string, on string, args ...interface{}) QueryJoin {
+func RightJoin(table string, on string, args ...any) QueryJoin {
 	return QueryJoin{
 		on:       on,
 		joinType: Right,
@@ -250,7 +278,7 @@ func RightJoin(table string, on string, args ...interface{}) QueryJoin {
 	}
 }
 
-func LeftJoin(table string, on string, args ...interface{}) QueryJoin {
+func LeftJoin(table string, on string, args ...any) QueryJoin {
 	return QueryJoin{
 		on:       on,
 		joinType: Left,
