@@ -81,7 +81,10 @@ func SQLConditionBuilder(Queries []QueryInterface) (string, []any, error) {
 
 	//Produce Where condition
 	for _, q := range Queries {
-		if q.GetType() == QueryTypeWhere || q.GetType() == QueryTypeOR || q.GetType() == QueryTypeWhereIn || q.GetType() == QueryTypeWhereNotIn {
+		if q.GetType() == QueryTypeWhere ||
+			q.GetType() == QueryTypeOR ||
+			q.GetType() == QueryTypeWhereIn ||
+			q.GetType() == QueryTypeWhereNotIn {
 			if strings.Count(q.GetQuery(), "?") != len(q.GetArgs()) {
 				return "", nil, errors.New(q.GetQuery() + "; args dosen't match with binds `?`")
 			}
