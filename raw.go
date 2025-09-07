@@ -51,11 +51,27 @@ func (handler *Context) RawUpdate(Tablename string, Cols map[string]any, Queries
 // RawBulkInsert insert multiple entries by []map[column name]value
 // This method dosen't support After,Before Triggers ...
 func (handler *Context) RawBulkInsert(Tablename string, Rows []map[string]any) (int64, error) {
+	return RawBulkInsert(handler, false, Tablename, Rows)
+}
+
+// RawBulkInsertIgnore insert ignore errors multiple entries by []map[column name]value
+// This method dosen't support After,Before Triggers ...
+func (handler *Context) RawBulkInsertIgnore(Tablename string, Rows []map[string]any) (int64, error) {
+	return RawBulkInsert(handler, true, Tablename, Rows)
+}
+
+// RawBulkInsert blank arguments
+func RawBulkInsert(handler *Context, Ignore bool, Tablename string, Rows []map[string]any) (int64, error) {
 	if len(Rows) == 0 {
 		return -1, ErrNoRowsForInsert
 	}
 
-	query := Insert + " INTO " + Tablename
+	strict := " INTO "
+	if Ignore {
+		strict = " IGNORE "
+	}
+
+	query := Insert + strict + Tablename
 	var args []any
 	var columnNames []string
 
