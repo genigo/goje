@@ -56,7 +56,7 @@ func ArgumentLessQueryBuilder(Action, Tablename string, Columns []string, Querie
 		query += " " + strings.Join(Columns, ",") + " "
 	}
 
-	query += " FROM " + Tablename
+	query += " FROM " + qouteColumn(Tablename)
 
 	conditions, args, err := SQLConditionBuilder(Queries)
 
