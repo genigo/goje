@@ -56,26 +56,26 @@ func FindInSet(columnName string, argument string) QueryWhere {
 	}
 }
 
-// Gt: (greater than) A helper for `column < ?`
+// Gt: (greater than) A helper for `column > ?`
 func Gt(columnName string, argument string) QueryWhere {
 	return QueryWhere{
-		query: qouteColumn(columnName) + " < ?",
+		query: qouteColumn(columnName) + " > ?",
 		args:  []any{argument},
 	}
 }
 
-// Gte: (greater equal than) A helper for `column <= ?`
+// Gte: (greater equal than) A helper for `column >= ?`
 func Gte(columnName string, argument string) QueryWhere {
 	return QueryWhere{
-		query: qouteColumn(columnName) + " <= ?",
+		query: qouteColumn(columnName) + " >= ?",
 		args:  []any{argument},
 	}
 }
 
-// Lt: (lower than) A helper for `column > ?`
+// Lt: (lower than) A helper for `column < ?`
 func Lt(columnName string, argument string) QueryWhere {
 	return QueryWhere{
-		query: qouteColumn(columnName) + " > ?",
+		query: qouteColumn(columnName) + " < ?",
 		args:  []any{argument},
 	}
 }
@@ -83,7 +83,7 @@ func Lt(columnName string, argument string) QueryWhere {
 // Lte: (lower equal than) A helper for `column >= ?`
 func Lte(columnName string, argument string) QueryWhere {
 	return QueryWhere{
-		query: qouteColumn(columnName) + " >= ?",
+		query: qouteColumn(columnName) + " <= ?",
 		args:  []any{argument},
 	}
 }

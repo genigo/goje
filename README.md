@@ -88,6 +88,13 @@ goje.Where("name = ?", "John")
 
 // Contains (LIKE with wildcards)
 goje.Contains("name", "john") // name LIKE '%john%'
+goje.EndsWith("name", "john") // name LIKE '%john'
+goje.StartsWith("name", "john") // name LIKE 'john%'
+goje.Eq("name", "john") // name = 'john'
+goje.Lt("age",11) // age < 1
+goje.Lte("age",11) // age <= 1
+goje.Gt("age",11) // age > 1
+goje.Gte("age",11) // age >= 1
 
 // IN conditions  
 goje.WhereIn("status", "active", "pending", "approved")
