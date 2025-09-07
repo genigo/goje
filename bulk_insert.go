@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-// BulkInsert insert multiple mixed items, INSERT INTO
+// BulkInsert insert multiple mixed items, INSERT [INTO,IGNORE]
 func BulkInsert(ctx *Context, ignore bool, entities []Entity) (int64, []error) {
 
 	// rows: [table_name][column_name]value
