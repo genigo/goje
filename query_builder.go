@@ -168,6 +168,7 @@ func qouteColumn(input string) string {
 		strings.Contains(input, "(") ||
 		strings.Contains(input, ":") ||
 		strings.Contains(input, "+") ||
+		strings.Contains(input, ",") ||
 		strings.Contains(input, "-") ||
 		strings.Contains(input, "^") ||
 		strings.Contains(input, "=") ||
