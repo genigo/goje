@@ -168,7 +168,6 @@ func qouteColumn(input string) string {
 		strings.Contains(input, "(") ||
 		strings.Contains(input, ":") ||
 		strings.Contains(input, "+") ||
-		strings.Contains(input, ",") ||
 		strings.Contains(input, "-") ||
 		strings.Contains(input, "^") ||
 		strings.Contains(input, "=") ||
@@ -180,6 +179,15 @@ func qouteColumn(input string) string {
 		return input
 	}
 	// backtick all parts
+	if strings.Contains(input, ",") {
+		values := strings.Split(input, ",")
+		for i := range values {
+			values[i] = qouteColumn(values[i])
+		}
+		return strings.Join(values, ",")
+	}
+
+	// backtick all column parts
 	if strings.Contains(input, ".") {
 		values := strings.Split(input, ".")
 		for i := range values {
