@@ -1,7 +1,7 @@
 package goje
 
 // Contains Query: A helper for `column LIKE '%Phrase%'`
-func Contains(columnName string, argument any) QueryWhere {
+func Contains(columnName string, argument string) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " LIKE ?",
 		args:  []any{"%" + argument + "%"},
@@ -9,7 +9,7 @@ func Contains(columnName string, argument any) QueryWhere {
 }
 
 // Find Query: A helper for `column LIKE ?`
-func Find(columnName string, argument any) QueryWhere {
+func Find(columnName string, argument string) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " LIKE ?",
 		args:  []any{argument},
@@ -17,7 +17,7 @@ func Find(columnName string, argument any) QueryWhere {
 }
 
 // StartsWith Query: A helper for `column LIKE 'Phrase%'`
-func StartsWith(columnName string, argument any) QueryWhere {
+func StartsWith(columnName string, argument string) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " LIKE ?",
 		args:  []any{argument + "%"},
@@ -25,7 +25,7 @@ func StartsWith(columnName string, argument any) QueryWhere {
 }
 
 // EndsWith Query: A helper for `column LIKE '%Phrase'`
-func EndsWith(columnName string, argument any) QueryWhere {
+func EndsWith(columnName string, argument string) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " LIKE ?",
 		args:  []any{"%" + argument},
