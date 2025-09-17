@@ -1,7 +1,7 @@
 package goje
 
 // Contains Query: A helper for `column LIKE '%Phrase%'`
-func Contains(columnName string, argument string) QueryWhere {
+func Contains(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " LIKE ?",
 		args:  []any{"%" + argument + "%"},
@@ -9,7 +9,7 @@ func Contains(columnName string, argument string) QueryWhere {
 }
 
 // Find Query: A helper for `column LIKE ?`
-func Find(columnName string, argument string) QueryWhere {
+func Find(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " LIKE ?",
 		args:  []any{argument},
@@ -17,7 +17,7 @@ func Find(columnName string, argument string) QueryWhere {
 }
 
 // StartsWith Query: A helper for `column LIKE 'Phrase%'`
-func StartsWith(columnName string, argument string) QueryWhere {
+func StartsWith(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " LIKE ?",
 		args:  []any{argument + "%"},
@@ -25,7 +25,7 @@ func StartsWith(columnName string, argument string) QueryWhere {
 }
 
 // EndsWith Query: A helper for `column LIKE '%Phrase'`
-func EndsWith(columnName string, argument string) QueryWhere {
+func EndsWith(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " LIKE ?",
 		args:  []any{"%" + argument},
@@ -41,7 +41,7 @@ func Eq(columnName string, argument string) QueryWhere {
 }
 
 // Not: A helper for `column !=?`
-func Not(columnName string, argument string) QueryWhere {
+func Not(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " != ?",
 		args:  []any{argument},
@@ -49,7 +49,7 @@ func Not(columnName string, argument string) QueryWhere {
 }
 
 // FindInSet: A helper for `FIND_IN_SET(?, column) > 0 `
-func FindInSet(columnName string, argument string) QueryWhere {
+func FindInSet(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: " FIND_IN_SET(?, " + qouteColumn(columnName) + ") > 0",
 		args:  []any{argument},
@@ -57,7 +57,7 @@ func FindInSet(columnName string, argument string) QueryWhere {
 }
 
 // Gt: (greater than) A helper for `column > ?`
-func Gt(columnName string, argument string) QueryWhere {
+func Gt(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " > ?",
 		args:  []any{argument},
@@ -65,7 +65,7 @@ func Gt(columnName string, argument string) QueryWhere {
 }
 
 // Gte: (greater equal than) A helper for `column >= ?`
-func Gte(columnName string, argument string) QueryWhere {
+func Gte(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " >= ?",
 		args:  []any{argument},
@@ -73,7 +73,7 @@ func Gte(columnName string, argument string) QueryWhere {
 }
 
 // Lt: (lower than) A helper for `column < ?`
-func Lt(columnName string, argument string) QueryWhere {
+func Lt(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " < ?",
 		args:  []any{argument},
@@ -81,7 +81,7 @@ func Lt(columnName string, argument string) QueryWhere {
 }
 
 // Lte: (lower equal than) A helper for `column >= ?`
-func Lte(columnName string, argument string) QueryWhere {
+func Lte(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " <= ?",
 		args:  []any{argument},
