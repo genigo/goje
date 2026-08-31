@@ -33,7 +33,35 @@ func NewDBConnection(conn *DBConfig) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	return openDB(driverName, conn)
+}
 
+// NewDBConnectionWithDriver opens a connection using a driver name the caller
+// registered outside goje — e.g. a driver wrapped by github.com/XSAM/otelsql
+// for OpenTelemetry tracing.
+// The dialect (identifier quoting, placeholder style) and DSN format still
+// come from conn.Driver ("mysql"/"postgres"); the wrapped driver must speak
+// the same protocol as conn.Driver.
+func NewDBConnectionWithDriver(driverName string, conn *DBConfig) (*sql.DB, error) {
+	if _, err := resolveDriver(conn.Driver); err != nil {
+		return nil, err
+	}
+	return openDB(driverName, conn)
+}
+
+// InitDBWithDriver connects the default database through a caller-registered
+// driver name (see NewDBConnectionWithDriver).
+func InitDBWithDriver(driverName string, conn *DBConfig) error {
+	db, err := NewDBConnectionWithDriver(driverName, conn)
+	if err != nil {
+		return err
+	}
+	DefatultDB = db
+	return nil
+}
+
+// openDB opens the database and applies the connection pool settings
+func openDB(driverName string, conn *DBConfig) (*sql.DB, error) {
 	db, err := sql.Open(driverName, conn.String())
 
 	if err != nil {

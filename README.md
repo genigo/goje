@@ -9,6 +9,7 @@ A lightweight, fluent SQL query builder for Go that generates safe SQL queries w
 - 📊 **Complex Query Support** - Joins, subqueries, aggregations, and more
 - 🚀 **Transaction Support** - Built-in transaction handling
 - 🎯 **MySQL Optimized** - Currently supports MySQL with room for expansion
+- 🔌 **Tracing-Ready** - Plug in an otelsql-wrapped driver for OpenTelemetry spans
 - 🧪 **Well Tested** - Comprehensive test coverage
 - ⚡ **Performance Focused** - Connection pooling and efficient query building
 
@@ -280,6 +281,54 @@ ConnMaxLifetime: 1800s
 - **MaxIdleConns**: Maximum number of connections in the idle connection pool
 - **MaxIdleTime**: Maximum time a connection may be idle before being closed
 - **ConnMaxLifetime**: Maximum time a connection may be reused
+
+## Tracing (OpenTelemetry)
+
+goje can run on a driver wrapped by [otelsql](https://github.com/XSAM/otelsql), so every statement gets an OpenTelemetry span. Register the wrapped driver in your app, then hand goje its name instead of letting goje pick the driver:
+
+```go
+import (
+    "log"
+
+    "github.com/XSAM/otelsql"
+    "github.com/genigo/goje"
+    "go.opentelemetry.io/otel/semconv/v1.26.0"
+)
+
+func main() {
+    driverName, err := otelsql.Register("mysql", otelsql.WithAttributes(
+        semconv.DBSystemMySQL,
+    ))
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    err = goje.InitDBWithDriver(driverName, &goje.DBConfig{
+        Driver:   "mysql",
+        Host:     "127.0.0.1",
+        Port:     3306,
+        User:     "root",
+        Password: "password",
+        Schema:   "mydb",
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+```
+
+For Postgres, register the underlying `pgx` driver and keep `Driver: "postgres"` in the config:
+
+```go
+driverName, err := otelsql.Register("pgx", otelsql.WithAttributes(...))
+if err != nil {
+    log.Fatal(err)
+}
+
+err = goje.InitDBWithDriver(driverName, &goje.DBConfig{Driver: "postgres", /* ... */})
+```
+
+goje itself has no OpenTelemetry dependency — spans are produced by otelsql at the driver layer and therefore cover every statement, including ones executed directly on the default DB. The application installs its own TracerProvider/SDK as described in the [OpenTelemetry Go docs](https://opentelemetry.io/docs/languages/go/); goje never sets one up for you.
 
 ## Error Handling
 
