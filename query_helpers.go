@@ -33,7 +33,7 @@ func EndsWith(columnName string, argument string) QueryWhere {
 }
 
 // Eq: A helper for `column =?`
-func Eq(columnName string, argument string) QueryWhere {
+func Eq(columnName string, argument any) QueryWhere {
 	return QueryWhere{
 		query: qouteColumn(columnName) + " = ?",
 		args:  []any{argument},
